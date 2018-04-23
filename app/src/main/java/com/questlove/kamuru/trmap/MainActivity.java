@@ -2,6 +2,8 @@ package com.questlove.kamuru.trmap;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
@@ -15,7 +17,9 @@ import android.widget.EditText;
 
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapPOIItem;
+import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
 import org.xml.sax.SAXException;
@@ -83,11 +87,23 @@ public class MainActivity extends AppCompatActivity implements TMapGpsManager.on
     }
 
     public void search(View view) {
+        mapView.removeAllMarkerItem();
+
         EditText editText = (EditText) findViewById(R.id.search_text);
         TMapData mapData = new TMapData();
 
         try {
             for (TMapPOIItem item : mapData.findAllPOI(editText.getText().toString())) {
+                TMapPoint point = new TMapPoint(Double.parseDouble(item.noorLat), Double.parseDouble(item.noorLon));
+                TMapMarkerItem markerItem = new TMapMarkerItem();
+                Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.poi_dot);
+
+                markerItem.setTMapPoint(point);
+                markerItem.setName(item.name);
+                markerItem.setVisible(markerItem.VISIBLE);
+                markerItem.setIcon(bitmap);
+
+                mapView.addMarkerItem(item.name, markerItem);
             }
         } catch (Exception e) {
             e.printStackTrace();
